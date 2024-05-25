@@ -1,0 +1,13 @@
+internal/ambulance_hr/README.md
+internal/ambulance_hr/api_hr_management.go
+internal/ambulance_hr/api_user_management.go
+internal/ambulance_hr/model_department_dto.go
+internal/ambulance_hr/model_department_enum.go
+internal/ambulance_hr/model_login_entry.go
+internal/ambulance_hr/model_personal_document.go
+internal/ambulance_hr/model_personal_document_entry.go
+internal/ambulance_hr/model_role_enum.go
+internal/ambulance_hr/model_user_dto.go
+internal/ambulance_hr/model_user_entry.go
+internal/ambulance_hr/model_user_list.go
+internal/ambulance_hr/routers.go

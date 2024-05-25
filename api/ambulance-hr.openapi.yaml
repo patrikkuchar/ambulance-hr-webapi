@@ -1,0 +1,409 @@
+openapi: 3.0.0
+servers:
+  - description: Cluster Endpoint
+    url: /api
+info:
+  description: Ambulance HR management API
+  version: "1.0.0"
+  title: HR management Api
+tags:
+  - name: HR management
+    description: HR management API
+  - name: User management
+    description: User management API
+paths:
+  "/users":
+    get:
+      tags:
+        - HR management
+      summary: Get all users
+      operationId: getUsers
+      description: Get all users
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserList"
+              examples:
+                response:
+                  $ref: "#/components/examples/UserListExample"
+    post:
+      tags:
+        - HR management
+      summary: Create new user
+      operationId: createUser
+      description: Create new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserEntry"
+            examples:
+              request-sample:
+                $ref: "#/components/examples/UserEntryExample"
+        description: User object to store
+        required: true
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserList"
+              examples:
+                response:
+                  $ref: "#/components/examples/UserListExample"
+        "400":
+          description: Missing mandatory properties of input object.
+        "409":
+          description: User with such email already exists
+
+  "/user/{userId}":
+    get:
+      tags:
+        - HR management
+      summary: Get user by id
+      operationId: getUser
+      description: Get user by id
+      parameters:
+        - in: path
+          name: userId
+          description: pass the id of the particular user
+          required: true
+          schema:
+              type: string
+      responses:
+        "200":
+          description: User object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDto"
+        "404":
+          description: User with such ID does not exist
+    delete:
+      tags:
+        - HR management
+      summary: Delete user by id
+      operationId: deleteUser
+      description : Delete user by id
+      parameters:
+        - in: path
+          name: userId
+          description: pass the id of the particular user
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: User deleted
+        "404":
+          description: User with such ID does not exist
+
+  "/user/{userId}/department":
+    patch:
+      tags:
+        - HR management
+      summary: Update user department
+      operationId: updateUserDepartment
+      description: Update user department
+      parameters:
+        - in: path
+          name: userId
+          description: pass the id of the particular user
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DepartmentDto"
+      responses:
+        "200":
+          description: User department updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDto"
+        "400":
+          description: Missing mandatory properties of input object.
+        "404":
+          description: User with such ID does not exist
+
+  "/user/{userId}/personalDocument":
+    post:
+      tags:
+        - User management
+      summary: Add personal document to user
+      operationId: addPersonalDocument
+      description: Add personal document to user
+      parameters:
+        - in: path
+          name: userId
+          description: pass the id of the particular user
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PersonalDocumentEntry"
+      responses:
+        "200":
+          description: Personal document added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PersonalDocument"
+        "400":
+          description: Missing mandatory properties of input object.
+        "404":
+          description: User with such ID does not exist
+    put:
+      tags:
+        - User management
+      summary: Update personal document of user
+      operationId: updatePersonalDocument
+      description: Update personal document of user
+      parameters:
+        - in: path
+          name: userId
+          description: pass the id of the particular user
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PersonalDocument"
+      responses:
+        "200":
+          description: Personal document updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PersonalDocument"
+        "400":
+          description: Missing mandatory properties of input object.
+        "404":
+          description: User with such ID does not exist, Document with such ID does not exist
+
+  "/login":
+    post:
+      tags:
+        - User management
+      summary: Login user
+      operationId: loginUser
+      description: Login user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginEntry"
+        description: User object to store
+        required: true
+      responses:
+        "200":
+          description: User logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDto"
+        "400":
+          description: Missing mandatory properties of input object.
+        "404":
+          description: User with such email does not exist
+
+components:
+  schemas:
+    UserList:
+      type: object
+      required:
+        - id
+        - name
+        - role
+        - department
+      properties:
+        id:
+          type: string
+          example: 123
+          description: Unique identifier of the user
+        name:
+          type: string
+          example: John Doe
+          description: Name of the user
+        role:
+          $ref: "#/components/schemas/RoleEnum"
+        department:
+          $ref: "#/components/schemas/DepartmentEnum"
+    UserEntry:
+      type: object
+      required:
+        - name
+        - role
+        - phone
+        - email
+        - department
+      properties:
+        name:
+          type: string
+          example: John Doe
+          description: Name of the user
+        role:
+          $ref: "#/components/schemas/RoleEnum"
+        phone:
+          type: string
+          example: +421 123 456 789
+          description: Phone number of the user
+        email:
+          type: string
+          example: john.doe@mail.com
+        department:
+          $ref: "#/components/schemas/DepartmentEnum"
+
+    UserDto:
+      type: object
+      required:
+        - id
+        - name
+        - role
+        - phone
+        - email
+        - department
+        - personalDocument
+      properties:
+        id:
+          type: string
+          example: 123
+          description: Unique identifier of the user
+        name:
+          type: string
+          example: John Doe
+          description: Name of the user
+        role:
+          $ref: "#/components/schemas/RoleEnum"
+        phone:
+          type: string
+          example: +421 123 456 789
+          description: Phone number of the user
+        email:
+          type: string
+          example: john.doe@mail.com
+        department:
+          $ref: "#/components/schemas/DepartmentEnum"
+        personalDocument:
+          type: array
+          items:
+            $ref: "#/components/schemas/PersonalDocument"
+
+    PersonalDocumentEntry:
+      type: object
+      required:
+        - name
+        - content
+      properties:
+        name:
+          type: string
+          example: "Document name"
+          description: Name of the document
+        content:
+          type: string
+          example: "This is a document content"
+          description: Content of the document
+
+    PersonalDocument:
+      type: object
+      required:
+        - id
+        - name
+        - content
+      properties:
+        id:
+          type: string
+          example: "123"
+          description: Unique identifier of the document
+        name:
+          type: string
+          example: "Document name"
+          description: Name of the document
+        content:
+          type: string
+          example: "This is a document content"
+          description: Content of the document
+
+    DepartmentDto:
+      type: object
+      required:
+        - department
+      properties:
+        department:
+          $ref: "#/components/schemas/DepartmentEnum"
+
+    LoginEntry:
+        type: object
+        required:
+          - email
+        properties:
+          email:
+            type: string
+            example: "john.doe@mail.com"
+            description: Email of the user
+
+    RoleEnum:
+      type: string
+      enum:
+        - Doctor
+        - Nurse
+        - Administrator
+        - Receptionist
+        - Technician
+        - Other
+
+    DepartmentEnum:
+      type: string
+      enum:
+        - GP
+        - Surgery
+        - Pediatrics
+        - Gynecology
+        - Neurology
+        - Other
+
+  examples:
+    UserListExample:
+      summary: List of users
+      description: |
+        Example list of users
+      value:
+        - id: 123
+          name: John Doe
+        - id: 124
+          name: Jane Doe
+
+    UserListOneExample:
+      summary: List of users
+      description: |
+        Example list of users
+      value:
+        - id: 123
+          name: John Doe
+          role: Doctor
+          department: Pediatrics
+
+    UserEntryExample:
+      summary: User entry
+      description: |
+        Example user entry
+      value:
+        name: John Doe
+        role: Doctor
+        phone: +421 123 456 789
+        email: john.doe@mail.com
+        department: Pediatrics
